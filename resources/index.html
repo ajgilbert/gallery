@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{TITLE}</title>
+<style>
+body {
+    font-family: Arial;
+}
+
+h4 {
+    margin: 0.3em 0em 0.0em 0em;
+}
+
+.plot-element {
+    text-align: center;
+    border-width:1px;
+    border-style:solid;
+    border-color: rgb(210,210,210);
+    margin:4px;
+    font-size:14px;
+}
+ 
+img {
+    margin:0px;
+    max-width:400px;
+    height:auto;
+    /*width:400px;*/
+}
+
+.gallery {
+    max-width: 100%
+}
+ 
+.isotope-item {
+    z-index: 2;
+}
+.isotope-hidden.isotope-item {
+    pointer-events: none;
+    z-index: 1;
+}
+.isotope,
+.isotope .isotope-item {
+  /* change duration value to whatever you like */
+    -webkit-transition-duration: 0.8s;
+    -moz-transition-duration: 0.8s;
+    transition-duration: 0.8s;
+}
+.isotope {
+    -webkit-transition-property: height, width;
+    -moz-transition-property: height, width;
+    transition-property: height, width;
+}
+.isotope .isotope-item {
+    -webkit-transition-property: -webkit-transform, opacity;
+    -moz-transition-property: -moz-transform, opacity;
+    transition-property: transform, opacity;
+}
+
+input[type="text"] {
+  font-size: 20px;
+}
+
+/* ---- button ---- */
+.button {
+  display: inline-block;
+  padding: 0.5em 1.0em;
+  background: #EEE;
+  border: none;
+  border-radius: 7px;
+  background-image: linear-gradient( to bottom, hsla(0, 0%, 0%, 0), hsla(0, 0%, 0%, 0.2) );
+  color: #222;
+  font-family: sans-serif;
+  font-size: 16px;
+  /*text-shadow: 0 1px white;*/
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #8CF;
+  /*text-shadow: 0 1px hsla(0, 0%, 100%, 0.5);*/
+  color: #222;
+}
+
+.button:active,
+.button.is-checked {
+  background-color: #28F;
+}
+
+.button.is-checked {
+  color: white;
+  /*text-shadow: 0 -1px hsla(0, 0%, 0%, 0.8);*/
+}
+
+.button:active {
+  box-shadow: inset 0 1px 10px hsla(0, 0%, 0%, 0.8);
+}
+
+/* ---- button-group ---- */
+.button-group:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.button-group .button {
+  float: left;
+  border-radius: 0;
+  margin-left: 0;
+  margin-right: 1px;
+}
+
+.button-group .button:first-child { border-radius: 0.5em 0 0 0.5em; }
+.button-group .button:last-child { border-radius: 0 0.5em 0.5em 0; }
+</style>
+<script src="https://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.2/isotope.pkgd.min.js"></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+</head>
+<body>
+ 
+<div class="filters">
+{BUTTONS}
+</div>
+
+<p><input type="text" class="quicksearch" placeholder="Regex Search" /></p>
+
+<div class="gallery">
+{ELEMENTS}
+</div>
+
+<script type="text/javascript">
+ $(window).load(function(){
+
+     var qsRegex;
+     var buttonFilter;
+     var $container = $('.gallery');
+
+     $container.isotope({
+          filter: function() {
+            var $this = $(this);
+            var searchResult = qsRegex ? $this.find('.file-title').text().match( qsRegex ) : true;
+            var buttonResult = buttonFilter ? $this.is( buttonFilter ) : true;
+            return searchResult && buttonResult;
+          },
+          resizable: false
+     });
+  
+     // store filter for each group
+     var filters = {};
+
+     $('.filters').on( 'click', '.button', function() {
+       var $this = $(this);
+       // get group key
+       var $buttonGroup = $this.parents('.button-group');
+       var filterGroup = $buttonGroup.attr('data-filter-group');
+       // set filter for group
+       filters[ filterGroup ] = $this.attr('data-filter');
+       // combine filters
+       buttonFilter = concatValues( filters );
+       // set filter for Isotope
+       $container.isotope();
+     });
+
+
+     // change is-checked class on buttons
+     $('.button-group').each( function( i, buttonGroup ) {
+       var $buttonGroup = $( buttonGroup );
+       $buttonGroup.on( 'click', 'button', function() {
+         $buttonGroup.find('.is-checked').removeClass('is-checked');
+         $( this ).addClass('is-checked');
+       });
+     });
+
+     // use value of search field to filter
+     var $quicksearch = $('.quicksearch').keyup( debounce( function() {
+       qsRegex = new RegExp( $quicksearch.val(), 'gi' );
+       $container.isotope();
+     }, 200 ) );
+
+     function debounce( fn, threshold ) {
+       var timeout;
+       return function debounced() {
+         if ( timeout ) {
+           clearTimeout( timeout );
+         }
+         function delayed() {
+           fn();
+           timeout = null;
+         }
+         timeout = setTimeout( delayed, threshold || 100 );
+       }
+     }
+
+     // flatten object by concatting values
+     function concatValues( obj ) {
+       var value = '';
+       for ( var prop in obj ) {
+         value += obj[ prop ];
+       }
+       return value;
+     }
+
+     // Trigger an update with the mathjax has loaded
+     MathJax.Hub.Register.StartupHook("End",function () { $container.isotope('layout'); });
+
+     // $container.imagesLoaded().progress( function() {
+     //   $container.isotope('layout');
+     // });
+
+ });
+</script>
+
+
+</body>
+</html> 
