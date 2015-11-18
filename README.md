@@ -10,11 +10,11 @@ Notes:
  - Files with the same name but different extensions will be linked automatically in the gallery
  - A search box is added at the top which accepts regular expressions for filtering images in the gallery
  - It is possible to define attributes that can be assigned to each image. These should be specified in a `.json` file with the same name as the image, with the format:
+ 
  ```json
  {
    "ATTRIBUTE1" : "VALUE1",
    "ATTRIBUTE2" : "VALUE2"
-   ...
  }
  ```
 These json files will be read automatically. A set of buttons will be created for each attribute with one button per value that can be used to quickly select the subset of images that were assigned that value.
