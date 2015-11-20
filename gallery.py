@@ -85,12 +85,11 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 		elements += PLOT_ELE.format(file='%s.png'%f, tags=tags, extra=extra)
 	
 	page_title = os.path.basename(os.path.normpath(indir))
-	
 	button_groups=''
 	# The user has added some properties so we need to make buttons
-	if len(groups) > 1:
+	if len(groups) > 0:
 		for key, val in groups.iteritems():
-			buttons='\n'.join([BUTTON.format(NAME=v, FILTER=CleanStr(v)) for v in val])
+			buttons='\n'.join([BUTTON.format(NAME=v, FILTER=CleanStr(v)) for v in sorted(val)])
 			button_groups += BUTTON_GROUP.format(GROUP=CleanStr(key), TITLE=key, BUTTONS=buttons)
 	
 	# Get the template file
