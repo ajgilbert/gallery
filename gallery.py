@@ -18,6 +18,8 @@ OTHER_FORMATS="""
 SINGLE_FORMAT="""
 	<a href="{file}">[{ext}]</a>"""
 
+SEARCH_BOX="""<p><input type="text" class="quicksearch" placeholder="Regex Search" /></p>"""
+
 BUTTON="""<button class="button" data-filter=".{FILTER}">{NAME}</button>"""
 
 BUTTON_GROUP="""\n
@@ -27,11 +29,11 @@ BUTTON_GROUP="""\n
 </div>"""
 
 OTHER_LIST="""\n
-<hr>
 <p id="otherfiles">Other files:</p>
 <ul>
   {LISTITEMS}
-</ul>"""
+</ul>
+<p><a href="#top">Back to top</a></p>"""
 
 def CleanStr(arg):
 	return '-'.join(arg.split())
@@ -41,6 +43,18 @@ parser.add_argument('input', help='input directory')
 parser.add_argument('--verbose', '-v', action='store_true', help='print some info to the screen')
 # parser.add_argument('output', help='output directory')
 args = parser.parse_args()
+
+def DoMarkdown(file):
+	script_dir = os.path.dirname(os.path.realpath(__file__))
+	with open(script_dir+'/resources/markdown.html') as index_file:
+	    index = index_file.read()
+	with open(file+'.md') as md_file:
+	    md = md_file.read()
+	index = index.replace('{TITLE}', os.path.basename(file))
+	index = index.replace('{CONTENT}', md)
+	print '>> Saving markdown file as '+file+'.html'
+	with open(file+'.html', "w") as outfile:
+	    outfile.write(index)
 
 def ProcessDir(indir, is_parent=True, subdirs=[]):
 	if not os.path.isdir(indir):
@@ -60,10 +74,11 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 	other_files = {k: v for k, v in all_base_files.items() if '.png' not in v}
 	
 	elements = ''
+	search_box = ''
 	
 	groups = defaultdict(set)
 	
-	for f, all_exts in base_files.iteritems():
+	for f, all_exts in sorted(base_files.iteritems()):
 		exts = [e for e in all_exts if e not in ['.png', '.json']]
 		tags=''
 		if '.json' in all_exts:
@@ -83,6 +98,9 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 		if args.verbose:
 			print info
 		elements += PLOT_ELE.format(file='%s.png'%f, tags=tags, extra=extra)
+
+	if elements != '':
+		search_box = SEARCH_BOX
 	
 	page_title = os.path.basename(os.path.normpath(indir))
 	button_groups=''
@@ -100,6 +118,7 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 	index = index.replace('{TITLE}', page_title)
 	index = index.replace('{ELEMENTS}', elements)
 	index = index.replace('{BUTTONS}', button_groups)
+	index = index.replace('{SEARCH}', search_box)
 	
 	all_other = ''
 	other_jump = ''
@@ -110,9 +129,14 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 			for ext in all_exts:
 				if ext in ['.html', '.htm', '.php']: continue
 				added += 1
-				other_html.append('  <li><a href="{FILE}">{FILE}</a></li>'.format(FILE=f+ext))
+				if ext == '.md':
+					DoMarkdown(os.path.join(indir, f))
+					other_html.append('  <li><a href="{FILEHTML}">{FILE}</a> <a href="{FILE}">[raw]</a></li>'.format(FILEHTML=f+'.html',FILE=f+ext))
+				else:
+					other_html.append('  <li><a href="{FILE}">{FILE}</a></li>'.format(FILE=f+ext))
 		if added > 0:
 			all_other = OTHER_LIST.format(LISTITEMS='\n'.join(other_html))
+			if elements != '': all_other = '<hr>\n' + all_other
 			other_jump = ' | <a href="#otherfiles">Jump to other files</a>'
 	index = index.replace('{OTHERFILESJUMP}', other_jump)
 	index = index.replace('{OTHERFILES}', all_other)
