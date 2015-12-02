@@ -6,7 +6,7 @@ from collections import defaultdict
 
 PLOT_ELE="""
   <div class="plot-element{tags}">
-      <p class="file-title">{file}</p>
+      <p class="file-title" style="font-size: {fontsize}%;">{file}</p>
       <a href="{file}">
       <img src="{file}" alt="image">
       </a>{extra}
@@ -41,6 +41,7 @@ def CleanStr(arg):
 parser = argparse.ArgumentParser()
 parser.add_argument('input', help='input directory')
 parser.add_argument('--verbose', '-v', action='store_true', help='print some info to the screen')
+parser.add_argument('--title-size', default='100', help='scale the text size of the plot titles, expressed as a percentage [0-100]')
 # parser.add_argument('output', help='output directory')
 args = parser.parse_args()
 
@@ -71,7 +72,7 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 	
 	# only keep the entries that have a png
 	base_files = {k: v for k, v in all_base_files.items() if '.png' in v}
-	other_files = {k: v for k, v in all_base_files.items() if '.png' not in v}
+	other_files = {k: v for k, v in all_base_files.items() if '.png' not in v and k.startswith('.') is False}
 	
 	elements = ''
 	search_box = ''
@@ -97,7 +98,7 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 			info += ' with extra extensions %s' % ','.join(exts)
 		if args.verbose:
 			print info
-		elements += PLOT_ELE.format(file='%s.png'%f, tags=tags, extra=extra)
+		elements += PLOT_ELE.format(file='%s.png'%f, tags=tags, extra=extra, fontsize=args.title_size)
 
 	if elements != '':
 		search_box = SEARCH_BOX
@@ -125,7 +126,7 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 	other_html = []
 	if len(other_files) > 0:
 		added = 0
-		for f, all_exts in other_files.iteritems():
+		for f, all_exts in sorted(other_files.iteritems()):
 			for ext in all_exts:
 				if ext in ['.html', '.htm', '.php']: continue
 				added += 1
