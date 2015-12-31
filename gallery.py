@@ -7,7 +7,7 @@ from collections import defaultdict
 PLOT_ELE="""
   <div class="plot-element{tags}">
       <p class="file-title" style="font-size: {fontsize}%;">{file}</p>
-      <a href="{file}">
+      <a href="{file}" class="fancybox" data-fancybox-group="gallery" title="{file}">
       <img src="{file}" alt="image">
       </a>{extra}
   </div>\n"""
