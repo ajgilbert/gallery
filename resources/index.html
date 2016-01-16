@@ -120,18 +120,41 @@ input[type="text"] {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.2/isotope.pkgd.min.js"></script>
 <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 <script type="text/javascript">
+  var thisHash = window.location.hash;
   $(document).ready(function() {
     $(".fancybox").fancybox({
-  openEffect  : 'none',
-  closeEffect : 'none',
-  padding : 0,
-  prevEffect    : 'none',
-  nextEffect    : 'none',
-    // closeBtn    : false,
-  // helpers   : {
-  //   title : { type : 'inside' }
-  // }
-});
+      openEffect  : 'none',
+      closeEffect : 'none',
+      padding : 0,
+      prevEffect    : 'none',
+      nextEffect    : 'none',
+      beforeShow: function() {
+          var id = this.element.attr("id")
+          if (id) {
+              if(history.replaceState) {
+                  history.replaceState(null, null, "#"+id);
+              }
+              else {
+                  window.location.hash = id;
+              }
+          }
+      },
+      beforeClose: function() {
+          if(history.replaceState) {
+              history.replaceState(null, null, "#");
+          }
+          else {
+              window.location.hash = "";
+          }
+      }
+        // closeBtn    : false,
+      // helpers   : {
+      //   title : { type : 'inside' }
+      // }
+    });
+    if (thisHash) {
+      document.getElementById(thisHash.replace('#','')).click();
+    }
   });
 </script>
 </head>
