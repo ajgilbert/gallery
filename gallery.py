@@ -71,8 +71,8 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 		all_base_files[name].add(ext)
 	
 	# only keep the entries that have a png
-	base_files = {k: v for k, v in all_base_files.items() if '.png' in v}
-	other_files = {k: v for k, v in all_base_files.items() if '.png' not in v and k.startswith('.') is False}
+	base_files = dict((k, v) for k, v in all_base_files.items() if '.png' in v)
+	other_files = dict((k, v) for k, v in all_base_files.items() if '.png' not in v and k.startswith('.') is False)
 	
 	elements = ''
 	search_box = ''
