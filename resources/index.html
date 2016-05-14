@@ -190,16 +190,13 @@ input[type="text"] {
        }
      });
     var url = [location.protocol, '//', location.host, location.pathname].join('')
-    console.log(url)
-    console.log(qsRegex)
-    console.log(pressedButtons)
     if (qsRegex)
     {
-        url += "?qsRegex=" + qsRegex
+        url += "?qsRegex=" + encodeURIComponent(qsRegex)
     }
     if (pressedButtons)
     {
-        url += ((qsRegex) ? "&" : "?") + "buttons=" + pressedButtons
+        url += ((qsRegex) ? "&" : "?") + "buttons=" + encodeURIComponent(pressedButtons)
     }
 	window.prompt("Copy to clipboard: Ctrl+C, Enter", url)
  }
@@ -246,8 +243,8 @@ input[type="text"] {
 				get_param = url_search_arr[i].split("=");
 
 				if (options.unescape) {
-					key = decodeURI(get_param[0]);
-					val = decodeURI(get_param[1]);
+					key = decodeURIComponent(get_param[0]);
+					val = decodeURIComponent(get_param[1]);
 				} else {
 					key = get_param[0];
 					val = get_param[1];
