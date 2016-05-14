@@ -41,6 +41,7 @@ def CleanStr(arg):
 parser = argparse.ArgumentParser()
 parser.add_argument('input', help='input directory')
 parser.add_argument('--verbose', '-v', action='store_true', help='print some info to the screen')
+parser.add_argument('--metadata', '-m', default='.json', help='extension for metadata informations (note the preceeding dot)')
 parser.add_argument('--title-size', default='100', help='scale the text size of the plot titles, expressed as a percentage [0-100]')
 # parser.add_argument('output', help='output directory')
 args = parser.parse_args()
@@ -80,9 +81,11 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 	groups = defaultdict(set)
 	
 	for f, all_exts in sorted(base_files.iteritems()):
-		exts = [e for e in all_exts if e not in ['.png', '.json']]
+		exts = [e for e in all_exts if e not in ['.png', args.metadata]]
 		tags=''
-		if '.json' in all_exts:
+
+		# For now only getting metadata from json is supported
+		if args.metadata in all_exts and args.metadata==".json":
 			json_data = {}
 			with open(os.path.join(indir,f+'.json')) as jsonfile:
 				json_data = json.load(jsonfile)
