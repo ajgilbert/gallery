@@ -289,7 +289,7 @@ input[type="text"] {
          // restore the search regex
 		qsRegex = options["qsRegex"];
         // also restore the value of the input field (currently does not work)
-		 $('.quicksearch').val = options["qsRegex"];
+		 $('.quicksearch').val(options["qsRegex"]);
 	}
      var buttonFilter;
      // check if buttons are in the options, if so set the buttons to them
