@@ -113,6 +113,9 @@ input[type="text"] {
 
 .button-group .button:first-child { border-radius: 0.5em 0 0 0.5em; }
 .button-group .button:last-child { border-radius: 0 0.5em 0.5em 0; }
+
+.urlcopybtn { margin: 0 0 0 0.5em;}
+
 </style>
 <script src="https://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.css" type="text/css" media="screen"/>
@@ -179,26 +182,11 @@ input[type="text"] {
 {OTHERFILES}
 
 <script type="text/javascript">
- // function to display the desired URL for reproducing the current state on another system
- function ShowUrlForCopy() {
-    var qsRegex = $('.quicksearch').val()
-    var pressedButtons
-     $('.button').each(function(i, button) {
-       var $button = $(button);
-       if ($button.is(".is-checked")) {
-           pressedButtons = pressedButtons ? pressedButtons+$button.attr('data-filter') : $button.attr('data-filter')
-       }
-     });
-    var url = [location.protocol, '//', location.host, location.pathname].join('')
-    if (qsRegex)
-    {
-        url += "?qsRegex=" + encodeURIComponent(qsRegex)
-    }
-    if (pressedButtons)
-    {
-        url += ((qsRegex) ? "&" : "?") + "buttons=" + encodeURIComponent(pressedButtons)
-    }
-	window.prompt("Copy to clipboard: Ctrl+C, Enter", url)
+ // function to select the URL displayed in documentUrl and copy it to the clipboard
+ function CopyUrl() {
+    $('.documentUrl').select()
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
  }
 
  // extract options from url as dict
@@ -280,6 +268,9 @@ input[type="text"] {
 	    history.replaceState(null, null, window.location.search)
     }
 
+    // display inital URL
+    updateUrl()
+
     // get the parameters for trom the URL
 	var options = urlParameter()
 
@@ -344,6 +335,8 @@ input[type="text"] {
        filters[ filterGroup ] = $this.attr('data-filter');
        // combine filters
        buttonFilter = concatValues( filters );
+       // update the displayed URL
+       updateUrl()
        // set filter for Isotope
        $container.isotope();
      });
@@ -361,6 +354,8 @@ input[type="text"] {
      // use value of search field to filter
      var $quicksearch = $('.quicksearch').keyup( debounce( function() {
        qsRegex = new RegExp( $quicksearch.val(), 'gi' );
+       // update the displayed URL
+       updateUrl()
        $container.isotope();
      }, 200 ) );
 
@@ -377,6 +372,28 @@ input[type="text"] {
          timeout = setTimeout( delayed, threshold || 100 );
        }
      }
+
+     // function to update the URL displayed
+     function updateUrl() {
+       var qsRegex = $('.quicksearch').val()
+       var pressedButtons
+       $('.button').each(function(i, button) {
+       var $button = $(button);
+       if ($button.is(".is-checked")) {
+           pressedButtons = pressedButtons ? pressedButtons+$button.attr('data-filter') : $button.attr('data-filter')
+       }
+       });
+       var url = [location.protocol, '//', location.host, location.pathname].join('')
+       if (qsRegex)
+       {
+           url += "?qsRegex=" + encodeURIComponent(qsRegex)
+       }
+       if (pressedButtons)
+       {
+           url += ((qsRegex) ? "&" : "?") + "buttons=" + encodeURIComponent(pressedButtons)
+       }
+       $('.documentUrl').val(url)
+    }
 
      // flatten object by concatting values
      function concatValues( obj ) {
