@@ -18,7 +18,7 @@ OTHER_FORMATS="""
 SINGLE_FORMAT="""
 	<a href="{file}">[{ext}]</a>"""
 
-SEARCH_BOX="""<p><input type="text" class="quicksearch" placeholder="Regex Search" /></p>"""
+SEARCH_BOX="""<p><input type="text" class="quicksearch" placeholder="Regex Search" /></p><p><input type="text" class="documentUrl" value="" /><input type="button" class="urlcopybtn" value="copy URL to clipboard" onclick="CopyUrl()"/></p>"""
 
 BUTTON="""<button class="button" data-filter=".{FILTER}">{NAME}</button>"""
 
