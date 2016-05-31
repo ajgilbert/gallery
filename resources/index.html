@@ -274,13 +274,14 @@ input[type="text"] {
     // get the parameters for trom the URL
 	var options = urlParameter()
 
-     var qsRegex;
+     var qsRegex
+     var Regex
     // check if quicksearch is in the options, if so restore the requested state
      if ("qsRegex" in options) {
          // restore the search regex
-		qsRegex = options["qsRegex"];
+		Regex = options["qsRegex"];
         // also restore the value of the input field (currently does not work)
-		 $('.quicksearch').val(options["qsRegex"]);
+		 $('.quicksearch').val(Regex);
 	}
      var buttonFilter;
      // check if buttons are in the options, if so set the buttons to them
@@ -353,7 +354,12 @@ input[type="text"] {
 
      // use value of search field to filter
      var $quicksearch = $('.quicksearch').keyup( debounce( function() {
-       qsRegex = new RegExp( $quicksearch.val(), 'gi' );
+       try {
+         qsRegex = new RegExp( $quicksearch.val(), 'gi' );
+       }
+       catch(e) {
+         return 1
+       }
        // update the displayed URL
        updateUrl()
        $container.isotope();
@@ -375,7 +381,7 @@ input[type="text"] {
 
      // function to update the URL displayed
      function updateUrl() {
-       var qsRegex = $('.quicksearch').val()
+       var Regex = $('.quicksearch').val()
        var pressedButtons
        $('.button').each(function(i, button) {
        var $button = $(button);
@@ -384,9 +390,9 @@ input[type="text"] {
        }
        });
        var url = [location.protocol, '//', location.host, location.pathname].join('')
-       if (qsRegex)
+       if (Regex)
        {
-           url += "?qsRegex=" + encodeURIComponent(qsRegex)
+           url += "?qsRegex=" + encodeURIComponent(Regex)
        }
        if (pressedButtons)
        {
