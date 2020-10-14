@@ -53,33 +53,33 @@ def DoMarkdown(file):
 	    md = md_file.read()
 	index = index.replace('{TITLE}', os.path.basename(file))
 	index = index.replace('{CONTENT}', md)
-	print '>> Saving markdown file as '+file+'.html'
+	print('>> Saving markdown file as '+file+'.html')
 	with open(file+'.html', "w") as outfile:
 	    outfile.write(index)
 
 def ProcessDir(indir, is_parent=True, subdirs=[]):
 	if not os.path.isdir(indir):
 		raise RuntimeError('Input argument %s is not a directory' % indir)
-	print '>> Processing directory %s' % indir
-	
+	print('>> Processing directory %s' % indir)
+
 	files = [f for f in os.listdir(indir) if os.path.isfile(os.path.join(indir,f))]
 	# print files
-	
+
 	all_base_files = defaultdict(set)
 	for f in files:
 		name,ext = os.path.splitext(f)
 		all_base_files[name].add(ext)
-	
+
 	# only keep the entries that have a png
 	base_files = dict((k, v) for k, v in all_base_files.items() if '.png' in v)
 	other_files = dict((k, v) for k, v in all_base_files.items() if '.png' not in v and k.startswith('.') is False)
-	
+
 	elements = ''
 	search_box = ''
-	
+
 	groups = defaultdict(set)
-	
-	for f, all_exts in sorted(base_files.iteritems()):
+
+	for f, all_exts in sorted(base_files.items()):
 		exts = [e for e in all_exts if e not in ['.png', '.json']]
 		tags=''
 		if '.json' in all_exts:
@@ -97,12 +97,12 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 			extra = OTHER_FORMATS.format(text=' '.join(do_exts))
 			info += ' with extra extensions %s' % ','.join(exts)
 		if args.verbose:
-			print info
+			print(info)
 		elements += PLOT_ELE.format(file='%s.png'%f, tags=tags, extra=extra, fontsize=args.title_size)
 
 	if elements != '':
 		search_box = SEARCH_BOX
-	
+
 	page_title = os.path.basename(os.path.normpath(indir))
 	button_groups=''
 	# The user has added some properties so we need to make buttons
@@ -110,17 +110,17 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 		for key, val in groups.iteritems():
 			buttons='\n'.join([BUTTON.format(NAME=v, FILTER=CleanStr(v)) for v in sorted(val)])
 			button_groups += BUTTON_GROUP.format(GROUP=CleanStr(key), TITLE=key, BUTTONS=buttons)
-	
+
 	# Get the template file
 	script_dir = os.path.dirname(os.path.realpath(__file__))
 	with open(script_dir+'/resources/index.html') as index_file:
 	    index = index_file.read()
-	
+
 	index = index.replace('{TITLE}', page_title)
 	index = index.replace('{ELEMENTS}', elements)
 	index = index.replace('{BUTTONS}', button_groups)
 	index = index.replace('{SEARCH}', search_box)
-	
+
 	all_other = ''
 	other_jump = ''
 	other_html = []
@@ -154,11 +154,11 @@ def ProcessDir(indir, is_parent=True, subdirs=[]):
 		links += '</p>'
 	index = index.replace('{LINKS}', links)
 
-	
+
 	# Write the html to the output folder
 	with open(os.path.join(indir,'index.html'), "w") as outfile:
 	    outfile.write(index)
-	
+
 	with open(script_dir+'/resources/download_all.php') as php_file:
 	    php_downloader = php_file.read()
 	with open(os.path.join(indir,'download_all.php'), "w") as outfile:
